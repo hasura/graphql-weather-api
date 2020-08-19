@@ -10,6 +10,7 @@
   "dependencies": {
     "apollo-fetch": "^0.7.0",
     "apollo-server": "^2.16.1",
+    "axios": "^0.19.2",
     "body-parser": "^1.17.2",
     "esm": "^3.0.28",
     "express": "^4.15.4",

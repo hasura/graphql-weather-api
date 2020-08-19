@@ -1,30 +1,21 @@
-const express = require("express");
-import fetch from "node-fetch";
-const bodyParser = require("body-parser");
-
-import {
-  graphqlExpress,
-  graphiqlExpress,
-  gql,
-  ApolloServer,
-} from "apollo-server-express";
-import { makeExecutableSchema } from "graphql-tools";
+const fetch = require("node-fetch");
+const { ApolloServer, gql } = require("apollo-server");
 
 const METAWEATHER_API_URL = "https://www.metaweather.com/api/location/";
 
-const typeDefs = `
-    type CityWeather {
-      temp: String
-      min_temp: String
-      max_temp: String
-      city_name: String!
-      applicable_date: String!
-    }
+const typeDefs = gql`
+  type CityWeather {
+    temp: String
+    min_temp: String
+    max_temp: String
+    city_name: String!
+    applicable_date: String!
+  }
 
-    type Query {
-      cityWeather(city_name: String! applicable_date: String): CityWeather
-    }
-  `;
+  type Query {
+    cityWeather(city_name: String!, applicable_date: String): CityWeather
+  }
+`;
 
 // get weather data using woeid
 function getWeather(data) {
@@ -73,22 +64,8 @@ const resolvers = {
   },
 };
 
-const cityWeatherSchema = makeExecutableSchema({
-  typeDefs,
-  resolvers,
+const server = new ApolloServer({ typeDefs, resolvers });
+
+server.listen({ port: process.env.PORT || 4000 }).then(({ url }) => {
+  console.log(`🚀 Server ready at ${url}`);
 });
-
-const app = new express();
-
-app.use(
-  "/graphql",
-  bodyParser.json(),
-  graphqlExpress({ schema: cityWeatherSchema })
-);
-
-app.use("/graphiql", graphiqlExpress({ endpointURL: "/graphql" }));
-
-app.listen(8080);
-console.log(
-  "Server running. Open http://localhost:8080/graphiql to run queries."
-);
